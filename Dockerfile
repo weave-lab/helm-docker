@@ -9,7 +9,6 @@ WORKDIR /
 
 ADD https://github.com/kubernetes/helm/releases/download/${VERSION}/${FILENAME} /tmp
 
-COPY helm_install_or_upgrade /bin/
 
 RUN tar -zxvf /tmp/${FILENAME} -C /tmp \
   && mv /tmp/linux-amd64/helm /bin/helm \
