@@ -1,14 +1,19 @@
-FROM google/cloud-sdk
+#FROM google/cloud-sdk
+FROM alpine:3.6
 
 MAINTAINER Clint Berry <clint@getweave.com>
 
-ENV VERSION v2.1.3
-ENV FILENAME helm-${VERSION}-linux-amd64.tar.gz
+ARG HELM_VERSION=v2.4.2
+ARG HELM_PKG=helm-${HELM_VERSION}-linux-amd64.tar.gz
+ARG HELM_URL=https://storage.googleapis.com/kubernetes-helm/${HELM_PKG}
 
-WORKDIR /
+ARG KUBECTL_VERSION=v1.6.6
+ARG KUBECTL_URL=https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl
 
-ADD https://kubernetes-helm.storage.googleapis.com/${FILENAME} /tmp
 
-RUN tar -zxvf /tmp/${FILENAME} -C /tmp \
-  && mv /tmp/linux-amd64/helm /bin/helm \
-  && rm -rf /tmp
+RUN apk add --no-cache --virtual .build-deps curl tar \
+ && echo ${HELM_URL} \
+ && curl -sSL ${HELM_URL} | tar xzf - --strip-components=1 -C /usr/bin \
+ && curl -sSL $KUBECTL_URL -o /usr/bin/kubectl \
+ && chmod +x /usr/bin/kubectl \
+ && apk del --no-cache .build-deps
